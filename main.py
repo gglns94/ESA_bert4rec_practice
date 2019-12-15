@@ -7,8 +7,8 @@ from utils import *
 
 def train():
     export_root = setup_train(args)
-    model = model_factory(args)
-    train_loader, val_loader, test_loader = dataloader_factory(args)
+    meta, train_loader, val_loader, test_loader = dataloader_factory(args)
+    model = model_factory(args, meta)
     trainer = trainer_factory(args, model, train_loader, val_loader, test_loader, export_root)
     trainer.train()
     # test_result = test_with(trainer.best_model, test_loader)

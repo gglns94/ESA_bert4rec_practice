@@ -2,6 +2,46 @@ def set_template(args):
     if args.template is None:
         return
 
+    elif args.template == 'train_vae':
+        args.model = 'train'
+
+        args.dataset_code = 'ml-1m'
+        args.min_rating = 4
+        args.min_uc = 5
+        args.min_sc = 0
+        args.split = 'user_ratio'
+        args.n_held_out = 1000
+        args.negative_sampling = False
+
+        args.dataloader_code = 'vae'
+        batch_size = 500
+        args.train_batch_size = batch_size
+        args.val_batch_size = batch_size
+        args.test_batch_size = batch_size
+
+        args.partition_ratio = 0.2
+        args.partition_random_seed = 1024
+
+        args.model_code = 'vae'
+        args.vae_p_dims = [200, 600]
+        args.vae_q_dims = None
+        args.vae_dropout = 0.5
+        args.vae_total_anneal_steps = 200000
+        args.vae_anneal_cap = 0.2
+
+        args.trainer_code = 'vae'
+        args.device = 'cuda'
+        args.num_gpu = 1
+        args.device_idx = '0'
+        args.optimizer = 'Adam'
+        args.lr = 1e-3
+        args.weight_decay = 0
+        args.decay_step = 1
+        args.gamma = 1.0
+        args.num_epochs = 200
+        args.metric_ks = [20, 50, 100]
+        args.best_metric = 'NDCG@100'
+
     elif args.template.startswith('train_bert'):
         args.mode = 'train'
 
@@ -17,6 +57,7 @@ def set_template(args):
         args.val_batch_size = batch
         args.test_batch_size = batch
 
+        args.negative_sampling = True
         args.train_negative_sampler_code = 'random'
         args.train_negative_sample_size = 0
         args.train_negative_sampling_seed = 0
@@ -47,6 +88,7 @@ def set_template(args):
         args.bert_num_blocks = 2
         args.bert_num_heads = 4
         args.bert_num_items = num_items
+
 
 
 def get_user_item_nums(args):

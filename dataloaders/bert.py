@@ -15,6 +15,11 @@ class BertDataloader(AbstractDataloader):
     def code(cls):
         return 'bert'
 
+    def get_meta(self):
+        return {
+            'item_count': self.item_count,
+        }
+
     def get_pytorch_dataloaders(self):
         train_loader = self._get_train_loader()
         val_loader = self._get_val_loader()

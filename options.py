@@ -23,11 +23,12 @@ parser.add_argument('--test_model_path', type=str, default=None)
 ################
 # Dataset
 ################
-parser.add_argument('--dataset_code', type=str, default='ml-20m', choices=DATASETS.keys())
+parser.add_argument('--dataset_code', type=str, default='ml-1m', choices=DATASETS.keys())
 parser.add_argument('--min_rating', type=int, default=4, help='Only keep ratings greater than equal to this value')
 parser.add_argument('--min_uc', type=int, default=5, help='Only keep users with more than min_uc ratings')
 parser.add_argument('--min_sc', type=int, default=0, help='Only keep items with more than min_sc ratings')
 parser.add_argument('--split', type=str, default='leave_one_out', help='How to split the datasets')
+parser.add_argument('--n_held_out', type=int, default=None)
 
 ################
 # Dataloader
@@ -38,9 +39,13 @@ parser.add_argument('--train_batch_size', type=int, default=64)
 parser.add_argument('--val_batch_size', type=int, default=64)
 parser.add_argument('--test_batch_size', type=int, default=64)
 
+parser.add_argument('--partition_ratio', type=float, default=None)
+parser.add_argument('--partition_random_seed', type=int, default=None)
+
 ################
 # NegativeSampler
 ################
+parser.add_argument('--negative-sampling', type=bool, default=True)
 parser.add_argument('--train_negative_sampler_code', type=str, default='random', choices=['popular', 'random'],
                     help='Method to sample negative items for training. Not used in bert')
 parser.add_argument('--train_negative_sample_size', type=int, default=100)
@@ -87,6 +92,12 @@ parser.add_argument('--bert_num_blocks', type=int, default=None, help='Number of
 parser.add_argument('--bert_num_heads', type=int, default=None, help='Number of heads for multi-attention')
 parser.add_argument('--bert_dropout', type=float, default=None, help='Dropout probability to use throughout the model')
 parser.add_argument('--bert_mask_prob', type=float, default=None, help='Probability for masking items in the training sequence')
+# VAE #
+parser.add_argument('--vae_p_dims', nargs='+', type=int, default=[200, 600])
+parser.add_argument('--vae_q_dims', nargs='*', type=int, default=None)
+parser.add_argument('--vae_dropout', type=float, default=0.5)
+parser.add_argument('--vae_total_anneal_steps', type=int, default=200000)
+parser.add_argument('--vae_anneal_cap', type=float, default=0.2)
 
 ################
 # Experiment

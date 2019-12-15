@@ -70,8 +70,7 @@ class AbstractDataset(metaclass=ABCMeta):
         df = self.load_ratings_df()
         df = self.make_implicit(df)
         df = self.filter_triplets(df)
-        df, umap, smap = self.densify_index(df)
-        train, val, test = self.split_df(df, len(umap))
+        train, val, test, umap, smap = self.split_df(df)
         dataset = {'train': train,
                    'val': val,
                    'test': test,
@@ -135,18 +134,47 @@ class AbstractDataset(metaclass=ABCMeta):
         df['sid'] = df['sid'].map(smap)
         return df, umap, smap
 
-    def split_df(self, df, user_count):
+    def split_df(self, df):
+        uc = df['uid'].unique().size
         if self.args.split == 'leave_one_out':
             print('Splitting')
+            df, umap, smap = self.densify_index(df)
             user_group = df.groupby('uid')
             user2items = user_group.progress_apply(lambda d: list(d.sort_values(by='timestamp')['sid']))
             train, val, test = {}, {}, {}
-            for user in range(1, user_count+1):
+            for user in range(1, uc+1):
                 items = user2items[user]
                 train[user], val[user], test[user] = items[:-2], items[-2:-1], items[-1:]
-            return train, val, test
+            return train, val, test, umap, smap
+        elif self.args.split == 'user_ratio':
+            uids = df['uid'].unique()
+
+            test_uc = self.args.n_held_out
+            val_uc = self.args.n_held_out
+
+            uids = uids[np.random.permutation(uc)]
+            train_uids = uids[:-(test_uc+val_uc)]
+            val_uids = uids[-(test_uc+val_uc):-test_uc]
+            test_uids = uids[-test_uc:]
+            sids = df[df['uid'].isin(train_uids)]['sid'].unique()
+            df = df[df['sid'].isin(sids)]
+            df, umap, smap = self.densify_index(df)
+
+            map_uids = np.vectorize(umap.get)
+            map_sids = np.vectorize(smap.get)
+
+            return (
+                self._df2dict(df, map_uids(train_uids), map_sids(sids)),
+                self._df2dict(df, map_uids(val_uids), map_sids(sids)),
+                self._df2dict(df, map_uids(test_uids), map_sids(sids)),
+                umap,
+                smap,
+            )
         else:
             raise NotImplementedError
+
+    def _df2dict(self, df, uids, sids):
+        return df[df['uid'].isin(uids) & df['sid'].isin(sids)].groupby('uid').aggregate({'sid': sorted}).to_dict()['sid']
 
     def _get_rawdata_root_path(self):
         return Path(RAW_DATASET_ROOT_FOLDER)

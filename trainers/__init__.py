@@ -1,8 +1,10 @@
+from trainers.vae import VAETrainer
 from .bert import BERTTrainer
 
 
 TRAINERS = {
     BERTTrainer.code(): BERTTrainer,
+    VAETrainer.code(): VAETrainer,
 }
 
 

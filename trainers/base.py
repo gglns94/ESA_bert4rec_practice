@@ -80,11 +80,7 @@ class AbstractTrainer(metaclass=ABCMeta):
             batch_size = batch[0].size(0)
             batch = [x.to(self.device) for x in batch]
 
-            self.optimizer.zero_grad()
-            loss = self.calculate_loss(batch)
-            loss.backward()
-
-            self.optimizer.step()
+            loss = self.backprop(batch)
 
             average_meter_set.update('loss', loss.item())
             tqdm_dataloader.set_description(
@@ -104,6 +100,14 @@ class AbstractTrainer(metaclass=ABCMeta):
                 self.logger_service.log_train(log_data)
 
         return accum_iter
+
+    def backprop(self, batch):
+        self.optimizer.zero_grad()
+        loss = self.calculate_loss(batch)
+        loss.backward()
+
+        self.optimizer.step()
+        return loss
 
     def validate(self, epoch, accum_iter):
         self.model.eval()

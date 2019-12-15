@@ -19,25 +19,33 @@ class AbstractDataloader(metaclass=ABCMeta):
         self.user_count = len(self.umap)
         self.item_count = len(self.smap)
 
-        code = args.train_negative_sampler_code
-        train_negative_sampler = negative_sampler_factory(code, self.train, self.val, self.test,
-                                                          self.user_count, self.item_count,
-                                                          args.train_negative_sample_size,
-                                                          args.train_negative_sampling_seed,
-                                                          save_folder)
-        code = args.test_negative_sampler_code
-        test_negative_sampler = negative_sampler_factory(code, self.train, self.val, self.test,
-                                                         self.user_count, self.item_count,
-                                                         args.test_negative_sample_size,
-                                                         args.test_negative_sampling_seed,
-                                                         save_folder)
+        if args.negative_sampling:
+            code = args.train_negative_sampler_code
+            train_negative_sampler = negative_sampler_factory(code, self.train, self.val, self.test,
+                                                              self.user_count, self.item_count,
+                                                              args.train_negative_sample_size,
+                                                              args.train_negative_sampling_seed,
+                                                              save_folder)
+            code = args.test_negative_sampler_code
+            test_negative_sampler = negative_sampler_factory(code, self.train, self.val, self.test,
+                                                             self.user_count, self.item_count,
+                                                             args.test_negative_sample_size,
+                                                             args.test_negative_sampling_seed,
+                                                             save_folder)
 
-        self.train_negative_samples = train_negative_sampler.get_negative_samples()
-        self.test_negative_samples = test_negative_sampler.get_negative_samples()
+            self.train_negative_samples = train_negative_sampler.get_negative_samples()
+            self.test_negative_samples = test_negative_sampler.get_negative_samples()
+        else:
+            self.train_negative_samples = None
+            self.test_negative_samples = None
 
     @classmethod
     @abstractmethod
     def code(cls):
+        pass
+
+    @abstractmethod
+    def get_meta(self):
         pass
 
     @abstractmethod
