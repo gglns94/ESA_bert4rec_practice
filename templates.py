@@ -2,9 +2,7 @@ def set_template(args):
     if args.template is None:
         return
 
-    elif args.template == 'train_vae':
-        args.model = 'train'
-
+    elif args.template == 'vae':
         args.dataset_code = 'ml-1m'
         args.min_rating = 4
         args.min_uc = 5
@@ -42,9 +40,7 @@ def set_template(args):
         args.metric_ks = [20, 50, 100]
         args.best_metric = 'NDCG@100'
 
-    elif args.template.startswith('train_bert'):
-        args.mode = 'train'
-
+    elif args.template.startswith('bert'):
         args.dataset_code = 'ml-1m'
         args.min_rating = 0
         args.min_uc = 5
@@ -74,7 +70,7 @@ def set_template(args):
         args.decay_step = 25
         args.gamma = 1.0
         args.num_epochs = 100
-        args.metric_ks = [1, 5, 10, 20, 50]
+        args.metric_ks = [1, 5, 10, 20, 50, 100]
         args.best_metric = 'NDCG@10'
 
         args.model_code = 'bert'
@@ -88,7 +84,6 @@ def set_template(args):
         args.bert_num_blocks = 2
         args.bert_num_heads = 4
         args.bert_num_items = num_items
-
 
 
 def get_user_item_nums(args):

@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='RecPlay')
 ################
 # Top Level
 ################
-parser.add_argument('--mode', type=str, default='train', choices=['train'])
+parser.add_argument('--mode', type=str, default='train', choices=['train', 'eval'])
 parser.add_argument('--template', type=str, default=None)
 
 ################
@@ -105,6 +105,7 @@ parser.add_argument('--vae_anneal_cap', type=float, default=0.2)
 parser.add_argument('--experiment_dir', type=str, default='experiments')
 parser.add_argument('--experiment_description', type=str, default='test')
 
+parser.add_argument('--eval_model_path', type=str, default=None)
 
 ################
 args = parser.parse_args()
